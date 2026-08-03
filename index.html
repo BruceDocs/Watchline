@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watchline — Cameras that act, not just record</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0E1420;
+    --panel:#141B2B;
+    --panel-2:#182238;
+    --line:#263047;
+    --text:#EDEFF3;
+    --muted:#93A1B8;
+    --accent:#F5C400;
+    --accent-ink:#1A1400;
+    --live:#33D6A6;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Archivo',sans-serif;margin:0;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;}
+  .nav-links button,.nav-cta,.btn-primary,.btn-ghost{
+    border:none;background:none;font:inherit;color:inherit;text-decoration:none;display:inline-block;
+  }
+  section{padding:96px clamp(20px,5vw,72px);max-width:1220px;margin:0 auto;}
+
+  /* nav */
+  .nav{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:22px clamp(20px,5vw,72px);position:sticky;top:0;z-index:20;
+    background:rgba(14,20,32,0.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:-0.01em;}
+  .logo-mark{width:20px;height:20px;border-radius:4px;background:var(--accent);position:relative;}
+  .logo-mark::after{content:"";position:absolute;inset:5px;border-radius:2px;background:var(--bg);}
+  .nav-links{display:flex;gap:32px;font-size:14.5px;color:var(--muted);}
+  .nav-links a:hover{color:var(--text);}
+  .nav-cta{background:var(--accent);color:var(--accent-ink);padding:10px 18px;border-radius:6px;font-weight:600;font-size:14px;}
+
+  /* hero */
+  .hero{padding:88px clamp(20px,5vw,72px) 60px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:56px;align-items:center;
+    max-width:1220px;margin:0 auto;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--accent);letter-spacing:.1em;
+    text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:22px;}
+  .eyebrow .blip{width:7px;height:7px;border-radius:50%;background:var(--live);animation:blip 1.6s ease-in-out infinite;}
+  @keyframes blip{0%,100%{opacity:1;}50%{opacity:.3;}}
+  h1.headline{font-size:clamp(38px,4.6vw,58px);line-height:1.04;font-weight:800;letter-spacing:-0.02em;max-width:15ch;}
+  .headline .hl{color:var(--accent);}
+  .sub{margin-top:22px;color:var(--muted);font-size:17px;line-height:1.65;max-width:46ch;}
+  .cta-row{display:flex;gap:14px;margin-top:34px;flex-wrap:wrap;}
+  .btn-primary{background:var(--accent);color:var(--accent-ink);padding:14px 24px;border-radius:7px;font-weight:700;font-size:15px;}
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-ghost{border:1px solid var(--line);padding:14px 24px;border-radius:7px;font-weight:600;font-size:15px;color:var(--text);}
+  .btn-ghost:hover{border-color:var(--muted);}
+  .trust{margin-top:28px;font-size:13px;color:var(--muted);}
+
+  /* --- signature element: live action log --- */
+  .action-log{border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden;}
+  .log-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;
+    border-bottom:1px solid var(--line);background:var(--panel-2);}
+  .log-head .title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+  .log-head .status{display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--live);}
+  .status .dot{width:6px;height:6px;border-radius:50%;background:var(--live);animation:blip 1.6s ease-in-out infinite;}
+  .log-body{padding:8px 0;max-height:340px;overflow:hidden;}
+  .log-row{display:flex;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);
+    opacity:0;transform:translateY(6px);animation:rise .5s ease forwards;}
+  .log-row:last-child{border-bottom:none;}
+  @keyframes rise{to{opacity:1;transform:translateY(0);}}
+  .log-time{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);white-space:nowrap;padding-top:1px;}
+  .log-text{font-size:13.5px;line-height:1.5;}
+  .log-text b{color:var(--text);font-weight:600;}
+  .log-tag{display:inline-block;margin-top:5px;font-family:'JetBrains Mono',monospace;font-size:10px;
+    padding:2px 7px;border-radius:20px;border:1px solid;}
+  .tag-detect{color:var(--muted);border-color:var(--line);}
+  .tag-action{color:var(--accent);border-color:rgba(245,196,0,0.35);}
+  .tag-resolved{color:var(--live);border-color:rgba(51,214,166,0.35);}
+
+  /* shift strip */
+  .shift{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:0;}
+  .shift-inner{display:grid;grid-template-columns:1fr 1fr;max-width:1220px;margin:0 auto;}
+  .shift-col{padding:52px clamp(20px,5vw,72px);}
+  .shift-col:first-child{border-right:1px solid var(--line);}
+  .shift-label{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .shift-col.after .shift-label{color:var(--accent);}
+  .shift-col h3{font-size:24px;margin-top:10px;font-weight:700;}
+  .shift-col ul{margin:18px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;}
+  .shift-col li{font-size:14.5px;color:var(--muted);padding-left:18px;position:relative;}
+  .shift-col.before li::before{content:"–";position:absolute;left:0;color:#4a5468;}
+  .shift-col.after li::before{content:"✓";position:absolute;left:0;color:var(--live);font-weight:700;}
+  .shift-col.after li{color:#C9D0DE;}
+
+  /* features */
+  .section-head{max-width:64ch;margin-bottom:44px;}
+  .section-head .eyebrow{margin-bottom:14px;}
+  .section-head h2{font-size:clamp(28px,3.2vw,38px);font-weight:800;letter-spacing:-0.01em;}
+  .section-head p{color:var(--muted);margin-top:14px;font-size:15.5px;line-height:1.65;}
+  .feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .feat{background:var(--panel);padding:30px 26px;}
+  .feat .num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);}
+  .feat h3{font-size:17.5px;margin-top:14px;font-weight:700;}
+  .feat p{color:var(--muted);font-size:14px;line-height:1.6;margin-top:10px;}
+
+  /* how it works */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .step{position:relative;padding-left:20px;}
+  .step::before{content:"";position:absolute;left:0;top:6px;bottom:-10px;width:1px;background:var(--line);}
+  .step:last-child::before{display:none;}
+  .step-index{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+  .step h3{font-size:19px;margin-top:8px;font-weight:700;}
+  .step p{color:var(--muted);font-size:14.5px;line-height:1.6;margin-top:10px;}
+
+  /* cta band */
+  .cta-band{max-width:1220px;margin:0 auto;width:calc(100% - clamp(20px,5vw,72px) * 2);
+    border-radius:16px;background:var(--panel);border:1px solid var(--line);
+    padding:56px clamp(24px,5vw,64px);display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;}
+  .cta-band h2{font-size:clamp(24px,2.8vw,32px);font-weight:800;max-width:20ch;}
+  .cta-band p{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:40ch;}
+
+  footer{padding:48px clamp(20px,5vw,72px) 60px;color:var(--muted);font-size:12.5px;line-height:1.7;
+    border-top:1px solid var(--line);margin-top:40px;}
+  .foot-inner{max-width:1220px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+    .shift-inner{grid-template-columns:1fr;}
+    .shift-col:first-child{border-right:none;border-bottom:1px solid var(--line);}
+    .steps{grid-template-columns:1fr;}
+  }
+
+  /* ---------- demo modal (Google Form embed) ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(8,11,18,0.72);backdrop-filter:blur(3px);
+    display:none;align-items:center;justify-content:center;z-index:100;padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    width:100%;max-width:560px;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;padding:26px 26px 22px;position:relative;
+  }
+  .modal-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;color:var(--muted);border:1px solid var(--line);
+    font-size:16px;cursor:pointer;z-index:2;background:var(--panel);}
+  .modal-close:hover{color:var(--text);border-color:var(--muted);}
+  .modal h3{font-size:21px;font-weight:800;}
+  .modal .sub-modal{color:var(--muted);font-size:13.5px;margin-top:8px;line-height:1.5;}
+  .form-embed-wrap{margin-top:18px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;}
+  .form-embed-wrap iframe{display:block;width:100%;height:520px;border:0;}
+  .field{margin-top:16px;}
+  .field label{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+  .field input,.field textarea{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:7px;
+    padding:11px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;outline:none;
+  }
+  .field input:focus,.field textarea:focus{border-color:var(--accent);}
+  .field textarea{resize:vertical;min-height:64px;}
+  .modal-submit{margin-top:20px;width:100%;background:var(--accent);color:var(--accent-ink);
+    border:none;padding:13px;border-radius:7px;font-weight:700;font-size:14.5px;cursor:pointer;}
+  .modal-submit:hover{filter:brightness(1.08);}
+  .modal-submit:disabled{opacity:.6;cursor:default;}
+  .modal-status{margin-top:12px;font-size:13px;font-family:'JetBrains Mono',monospace;min-height:18px;}
+  .modal-status.ok{color:var(--live);}
+  .modal-status.err{color:#FF6B6B;}
+  .modal-note{margin-top:14px;font-size:11.5px;color:#5b6478;line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="logo"><span class="logo-mark"></span> Watchline</div>
+  <div class="nav-links">
+    <button type="button" data-scroll="shift">Why it's different</button>
+    <button type="button" data-scroll="features">Platform</button>
+    <button type="button" data-scroll="how">How it works</button>
+  </div>
+  <button type="button" class="nav-cta" data-open-demo>Book a demo</button>
+</div>
+
+<div class="hero">
+  <div>
+    <div class="eyebrow"><span class="blip"></span> Now live on any existing camera</div>
+    <h1 class="headline">Cameras that <span class="hl">act</span>, not just record.</h1>
+    <p class="sub">Watchline puts a vision-language model behind every camera you already own — so incidents get detected, deterred, and documented automatically, across every site, without new hardware.</p>
+    <div class="cta-row">
+      <button type="button" class="btn-primary" data-open-demo>Book a demo</button>
+      <button type="button" class="btn-ghost" data-scroll="how">See how it works</button>
+    </div>
+    <div class="trust mono">Camera-agnostic · ONVIF & RTSP · Deploys in days, not months</div>
+  </div>
+
+  <div class="action-log">
+    <div class="log-head">
+      <span class="title mono">LIVE — ACTION LOG</span>
+      <span class="status"><span class="dot"></span> ACTIVE</span>
+    </div>
+    <div class="log-body" id="logBody"></div>
+  </div>
+</div>
+
+<div class="shift" id="shift">
+  <div class="shift-inner">
+    <div class="shift-col before">
+      <span class="shift-label mono">Before</span>
+      <h3>Passive recording</h3>
+      <ul>
+        <li>Footage sits unwatched until someone requests a clip</li>
+        <li>Investigations mean scrubbing hours of video by hand</li>
+        <li>Alerts fire on motion, flooding teams with false positives</li>
+        <li>Every site is its own island — no cross-location view</li>
+      </ul>
+    </div>
+    <div class="shift-col after">
+      <span class="shift-label mono">With Watchline</span>
+      <h3>An agent on every camera</h3>
+      <ul>
+        <li>Every frame is understood and searchable in plain English</li>
+        <li>Cases build themselves as incidents happen, not after</li>
+        <li>Verified events only — deterrence triggers in real time</li>
+        <li>One dashboard, federated search across every location</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="section-head">
+    <span class="eyebrow mono">Platform</span>
+    <h2>One layer, four jobs</h2>
+    <p>Watchline runs on top of the cameras you already have and takes on the work that used to sit with a person watching a monitor.</p>
+  </div>
+  <div class="feat-grid">
+    <div class="feat">
+      <div class="num mono">01</div>
+      <h3>Search in plain English</h3>
+      <p>Type "red pickup truck at the loading dock" and get matching clips across every site in seconds — no filters to configure.</p>
+    </div>
+    <div class="feat">
+      <div class="num mono">02</div>
+      <h3>Real-time deterrence</h3>
+      <p>When a verified event happens — loitering, an unlocked exit, a tailgate — Watchline can trigger audio, lights, or an alert before it escalates.</p>
+    </div>
+    <div class="feat">
+      <div class="num mono">03</div>
+      <h3>Cases that build themselves</h3>
+      <p>Clips, timestamps, and context get bundled into a case automatically, so investigations start with evidence instead of a search.</p>
+    </div>
+    <div class="feat">
+      <div class="num mono">04</div>
+      <h3>Works with what you own</h3>
+      <p>ONVIF and RTSP support means existing cameras connect directly — no rip-and-replace, no proprietary hardware required.</p>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="section-head">
+    <span class="eyebrow mono">How it works</span>
+    <h2>From camera to case in three steps</h2>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-index mono">STEP 1</div>
+      <h3>Connect</h3>
+      <p>Point your existing cameras at Watchline over ONVIF or RTSP. Most sites are live within a day, no new wiring.</p>
+    </div>
+    <div class="step">
+      <div class="step-index mono">STEP 2</div>
+      <h3>Understand</h3>
+      <p>The vision-language model indexes every frame — people, vehicles, actions, and context — as it happens, not after a request.</p>
+    </div>
+    <div class="step">
+      <div class="step-index mono">STEP 3</div>
+      <h3>Act</h3>
+      <p>Verified events trigger the right response automatically: an alert, a deterrent, or a case — while a human stays in control of every action.</p>
+    </div>
+  </div>
+</section>
+
+<div class="cta-band" id="demo">
+  <div>
+    <h2>See it running on your own cameras.</h2>
+    <p>A 20-minute walkthrough, using footage from your own sites where possible — no commitment required.</p>
+  </div>
+  <button type="button" class="btn-primary" data-open-demo>Book a demo</button>
+</div>
+
+<div class="modal-overlay" id="demoOverlay">
+  <div class="modal">
+    <div class="modal-close" id="demoClose">✕</div>
+    <h3>Book your demo</h3>
+    <p class="sub-modal">Tell us a bit about your sites and we'll follow up to schedule your 20-minute walkthrough.</p>
+    <form id="demoForm">
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" id="fName" required placeholder="Jane Rivera">
+      </div>
+      <div class="field">
+        <label>Work email</label>
+        <input type="email" id="fEmail" required placeholder="jane@company.com">
+      </div>
+      <div class="field">
+        <label>Company</label>
+        <input type="text" id="fCompany" required placeholder="Company name">
+      </div>
+      <div class="field">
+        <label>Notes (optional)</label>
+        <textarea id="fNotes" placeholder="Number of sites, current camera setup, timeline..."></textarea>
+      </div>
+      <button type="submit" class="modal-submit" id="demoSubmit">Request demo</button>
+      <div class="modal-status" id="demoStatus"></div>
+      <div class="modal-note">Submits directly to a Google Form's response endpoint — responses land in the linked Google Sheet, no Google branding shown on this page.</div>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <div class="foot-inner">
+    <span>© 2026 Watchline. Concept site inspired by category leaders in AI video security — not affiliated with or endorsed by any named company.</span>
+    <span class="mono">rev. 2026.08.03</span>
+  </div>
+</footer>
+
+<script>
+  const events = [
+    { t: "14:02:11", tag: "detect", text: "<b>Loitering</b> detected — north lot, Camera 04" },
+    { t: "14:02:13", tag: "action", text: "Verified against 90s dwell rule — <b>alert sent</b> to on-duty guard" },
+    { t: "14:03:47", tag: "detect", text: "<b>Unattended bag</b> flagged — lobby, Camera 12" },
+    { t: "14:03:50", tag: "resolved", text: "Owner matched via re-entry — <b>auto-cleared</b>, no escalation" },
+    { t: "14:05:22", tag: "detect", text: "<b>Tailgate</b> at secure door — east entrance" },
+    { t: "14:05:24", tag: "action", text: "Door held open trigger — <b>case opened</b>, clip attached" },
+    { t: "14:07:03", tag: "detect", text: "<b>Vehicle match</b>: white van, watchlist plate — drive-thru" },
+    { t: "14:07:05", tag: "action", text: "Front-of-house <b>notified</b> in real time" },
+  ];
+  const body = document.getElementById('logBody');
+  const tagClass = { detect: 'tag-detect', action: 'tag-action', resolved: 'tag-resolved' };
+  const tagLabel = { detect: 'DETECTED', action: 'ACTION TAKEN', resolved: 'RESOLVED' };
+  let i = 0;
+
+  function addRow(){
+    const e = events[i % events.length];
+    const row = document.createElement('div');
+    row.className = 'log-row';
+    row.innerHTML = `
+      <div class="log-time mono">${e.t}</div>
+      <div class="log-text">${e.text}<br><span class="log-tag ${tagClass[e.tag]}">${tagLabel[e.tag]}</span></div>
+    `;
+    body.prepend(row);
+    while(body.children.length > 5){ body.removeChild(body.lastChild); }
+    i++;
+  }
+  addRow();
+  setInterval(addRow, 2600);
+
+  // ---------- smooth in-page nav (avoids raw hash navigation issues in embedded preview) ----------
+  document.querySelectorAll('[data-scroll]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.getElementById(link.getAttribute('data-scroll'));
+      if(target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // ---------- demo modal open/close ----------
+  const overlay = document.getElementById('demoOverlay');
+  document.querySelectorAll('[data-open-demo]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      overlay.classList.add('open');
+    });
+  });
+  document.getElementById('demoClose').addEventListener('click', () => overlay.classList.remove('open'));
+  overlay.addEventListener('click', (e) => { if(e.target === overlay) overlay.classList.remove('open'); });
+
+  // ---------- demo form submit -> posts straight to the Google Form's response endpoint ----------
+  //
+  // SETUP (one-time, in your own Google Form):
+  // 1. Open your form's live "viewform" page, right-click -> View Page Source.
+  // 2. Search for `entry.` to find each field's ID, e.g. name="entry.123456789".
+  //    Match each one to the fields below (name, email, company, notes).
+  // 3. Take the form's URL and change ".../viewform" to ".../formResponse" — that's GOOGLE_FORM_ACTION_URL.
+  //
+  const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLScDPLZPOikmAynmRwiAYXkmdXw5YJF2lrNd2Ewy9maicjJIdw/formResponse";
+  const ENTRY_IDS = {
+    name: "entry.2005620554",
+    email: "entry.1045781291",
+    company: "entry.1065046570",
+    notes: "entry.1166974658"
+  };
+
+  document.getElementById('demoForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('fName').value.trim();
+    const email = document.getElementById('fEmail').value.trim();
+    const company = document.getElementById('fCompany').value.trim();
+    const notes = document.getElementById('fNotes').value.trim();
+
+    const submitBtn = document.getElementById('demoSubmit');
+    const status = document.getElementById('demoStatus');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+    status.className = 'modal-status';
+    status.textContent = '';
+
+    const formData = new URLSearchParams();
+    formData.append(ENTRY_IDS.name, name);
+    formData.append(ENTRY_IDS.email, email);
+    formData.append(ENTRY_IDS.company, company);
+    formData.append(ENTRY_IDS.notes, notes);
+
+    try {
+      // no-cors: Google blocks reading the response, so we can't confirm status codes —
+      // this is the standard pattern for posting to Google Forms from an external page.
+      await fetch(GOOGLE_FORM_ACTION_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData.toString()
+      });
+
+      status.className = 'modal-status ok';
+      status.textContent = 'Request sent — we\'ll be in touch shortly.';
+      document.getElementById('demoForm').reset();
+    } catch (err) {
+      status.className = 'modal-status err';
+      status.textContent = 'Could not send automatically. Please email us directly instead.';
+      console.error('Demo request error:', err);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Request demo';
+    }
+  });
+</script>
+
+</body>
+</html>
